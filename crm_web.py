@@ -2,6 +2,8 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import os
+import json
+import base64
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 
@@ -13,20 +15,8 @@ st.caption("Powered by AI — your inquiry will be reviewed instantly")
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-creds_dict = {
-    "type": st.secrets["gcp_type"],
-    "project_id": st.secrets["gcp_project_id"],
-    "private_key_id": st.secrets["gcp_private_key_id"],
-    "private_key": st.secrets["gcp_private_key"],
-    "client_email": st.secrets["gcp_client_email"],
-    "client_id": st.secrets["gcp_client_id"],
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_x509_cert_url": st.secrets["gcp_client_x509_cert_url"],
-    "universe_domain": "googleapis.com"
-}
-
+creds_json = base64.b64decode(st.secrets["GOOGLE_CREDS_B64"]).decode('utf-8')
+creds_dict = json.loads(creds_json)
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 client = gspread.authorize(creds)
 SHEET_ID = "15l2G3kwcZq1rZEvOj4rHsOy-L-F38CzXsIE1VMvobzY"
