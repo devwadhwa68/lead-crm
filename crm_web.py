@@ -2,17 +2,19 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import os
+import json
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 
-os.environ["GROQ_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 st.set_page_config(page_title="AI Lead Capture", page_icon="📋")
 st.title("📋 Submit Your Inquiry")
 st.caption("Powered by AI — your inquiry will be reviewed instantly")
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-creds = Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
+creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
+creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 client = gspread.authorize(creds)
 SHEET_ID = "15l2G3kwcZq1rZEvOj4rHsOy-L-F38CzXsIE1VMvobzY"
 sheet = client.open_by_key(SHEET_ID).sheet1
