@@ -14,15 +14,18 @@ os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 st.set_page_config(page_title="CRM Dashboard", page_icon="📊", layout="wide")
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-creds_json = base64.b64decode(st.secrets["GOOGLE_CREDS_B64"]).decode('utf-8')
-creds_dict = json.loads(creds_json)
-creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
-client = gspread.authorize(creds)
 SHEET_ID = "15l2G3kwcZq1rZEvOj4rHsOy-L-F38CzXsIE1VMvobzY"
-sheet = client.open_by_key(SHEET_ID).sheet1
+
+def get_sheet():
+    creds_json = base64.b64decode(st.secrets["GOOGLE_CREDS_B64"]).decode('utf-8')
+    creds_dict = json.loads(creds_json)
+    creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+    client = gspread.authorize(creds)
+    return client.open_by_key(SHEET_ID).sheet1
 
 @st.cache_data(ttl=60)
 def load_data():
+    sheet = get_sheet()
     data = sheet.get_all_records()
     return pd.DataFrame(data)
 
